@@ -1,0 +1,186 @@
+{
+  "intents": [
+    {
+      "name": "AMAZON.CancelIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.HelpIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.StopIntent",
+      "samples": []
+    },
+    {
+      "name": "bail",
+      "samples": [
+        "i need to bail",
+        "i need a me night",
+        "i need to rest",
+        "ugh",
+        "I need to bail because {reason}"
+      ],
+      "slots": [
+        {
+          "name": "reason",
+          "type": "reason",
+          "samples": [
+            "That sounds fine."
+          ]
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "reason",
+      "values": [
+        {
+          "id": null,
+          "name": {
+            "value": "sick",
+            "synonyms": [
+              "not feeling well",
+              "not well",
+              "ill"
+            ]
+          }
+        },
+        {
+          "id": null,
+          "name": {
+            "value": "bored",
+            "synonyms": [
+              "don't feel like it",
+              "ugh"
+            ]
+          }
+        },
+        {
+          "id": null,
+          "name": {
+            "value": "tired",
+            "synonyms": [
+              "wiped out"
+            ]
+          }
+        },
+        {
+          "id": null,
+          "name": {
+            "value": "broke",
+            "synonyms": [
+              "no money",
+              "poor"
+            ]
+          }
+        },
+        {
+          "id": null,
+          "name": {
+            "value": "busy",
+            "synonyms": [
+              "happening"
+            ]
+          }
+        },
+        {
+          "id": null,
+          "name": {
+            "value": "double booked",
+            "synonyms": [
+              "seeing someone else",
+              "another"
+            ]
+          }
+        },
+        {
+          "id": null,
+          "name": {
+            "value": "work",
+            "synonyms": [
+              "things to do"
+            ]
+          }
+        },
+        {
+          "id": null,
+          "name": {
+            "value": "stressed",
+            "synonyms": [
+              "manic",
+              "crazed"
+            ]
+          }
+        },
+        {
+          "id": null,
+          "name": {
+            "value": "homework",
+            "synonyms": [
+              "studying",
+              "school",
+              "class"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "prompts": [
+    {
+      "id": "Confirm.Intent-bail",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Bummer, why are you bailing?"
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-bail.IntentSlot-reason",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Why are you bailing?"
+        },
+        {
+          "type": "PlainText",
+          "value": "What else is going on?"
+        },
+        {
+          "type": "PlainText",
+          "value": "Are things okay?"
+        }
+      ]
+    }
+  ],
+  "dialog": {
+    "version": "1.0",
+    "intents": [
+      {
+        "name": "bail",
+        "confirmationRequired": true,
+        "prompts": {
+          "confirm": "Confirm.Intent-bail"
+        },
+        "slots": [
+          {
+            "name": "reason",
+            "type": "reason",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-bail.IntentSlot-reason"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
