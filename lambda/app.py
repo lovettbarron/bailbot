@@ -5,22 +5,39 @@ import random
 
 # --------------- Helpers that build all of the responses ----------------------
 
-def build_speechlet_response(output, should_end_session):
-	return {
-		'outputSpeech': {
-			'type': 'PlainText',
-			'text': output
-		},
-		'shouldEndSession': should_end_session
-	}
+def build_speechlet_response(output, should_end_session,card_content=None):
+	if card_content:
+		resp = {
+			'outputSpeech': {
+				'type': 'PlainText',
+				'text': output
+			},
+			'shouldEndSession': should_end_session
+		}
+	else:
+		resp = {
+			'outputSpeech': {
+				'type': 'PlainText',
+				'text': output
+			},
+			'card': {
+				'content': card_content
+				, 'title': "Bail Bot Excuse"
+				, 'type': 'Simple'
+			},
+			'shouldEndSession': should_end_session
+		}
+		
+	return resp
 
 
 def build_response(session_attributes, speechlet_response):
-	return {
-		'version': '1.0',
-		'sessionAttributes': session_attributes,
-		'response': speechlet_response
+	response_cont = {
+		'version': '1.0'
+		,'sessionAttributes': session_attributes
+		,'response': speechlet_response
 	}
+	return response_cont
 
 
 # --------------- Functions that control the skill's behavior ------------------
@@ -28,15 +45,18 @@ def build_response(session_attributes, speechlet_response):
 def get_welcome_response():
 	session_attributes = {}
 	card_title = "You need an out?"
-	speech_output = "Hello World "
+	
+	start = ['So you want to stay in tonight?','Looking to bail on your plans?','Going out is hard. Need an excuse?','I never go out, and can help you with an excuse!']
+	speech_output = random.choice(start) 
 	reprompt_text = None
-	should_end_session = True
+	should_end_session = False
 	return build_response(session_attributes, build_speechlet_response(speech_output, should_end_session))
 
 
 def handle_session_end_request():
 	card_title = "Session Ended"
-	speech_output = "Goodbye " 
+	finish = ['Looking forward to spending time tonight','Glad you are sticking around','it is nice to be alone sometimes','Thanks for spending time with me','I might stay in too']
+	speech_output = random.choice(finish) 
 	should_end_session = True
 	return build_response({}, build_speechlet_response(speech_output, should_end_session))
 
@@ -44,11 +64,10 @@ def handle_session_end_request():
 def bail(intent, session):
 	session_attributes = {}
 	reason = pick_reason('')
-	firstname = intent['slots']['firstname']['value']
 	reprompt_text = None
-	speech_output = 'You can say ' + reason.get('excuse')
-	should_end_session = True
-	return build_response(session_attributes, build_speechlet_response(speech_output, should_end_session))
+	speech_output = 'You could try ' + reason.get('excuse')
+	should_end_session = False
+	return build_response(session_attributes, build_speechlet_response(speech_output, should_end_session,speech_output))
 
 def fetch_reasons():
 	s3 = boto3.resource('s3')

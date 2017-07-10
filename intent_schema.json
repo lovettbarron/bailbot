@@ -10,7 +10,12 @@
     },
     {
       "name": "AMAZON.StopIntent",
-      "samples": []
+      "samples": [
+        "thanks",
+        "okay",
+        "that works",
+        "awesome"
+      ]
     },
     {
       "name": "bail",
@@ -19,15 +24,16 @@
         "i need a me night",
         "i need to rest",
         "ugh",
-        "I need to bail because {reason}"
+        "I need to bail because {reason}",
+        "yes",
+        "next",
+        "stay home"
       ],
       "slots": [
         {
           "name": "reason",
           "type": "reason",
-          "samples": [
-            "That sounds fine."
-          ]
+          "samples": []
         }
       ]
     }
@@ -127,60 +133,5 @@
         }
       ]
     }
-  ],
-  "prompts": [
-    {
-      "id": "Confirm.Intent-bail",
-      "promptVersion": "1.0",
-      "definitionVersion": "1.0",
-      "variations": [
-        {
-          "type": "PlainText",
-          "value": "Bummer, why are you bailing?"
-        }
-      ]
-    },
-    {
-      "id": "Elicit.Intent-bail.IntentSlot-reason",
-      "promptVersion": "1.0",
-      "definitionVersion": "1.0",
-      "variations": [
-        {
-          "type": "PlainText",
-          "value": "Why are you bailing?"
-        },
-        {
-          "type": "PlainText",
-          "value": "What else is going on?"
-        },
-        {
-          "type": "PlainText",
-          "value": "Are things okay?"
-        }
-      ]
-    }
-  ],
-  "dialog": {
-    "version": "1.0",
-    "intents": [
-      {
-        "name": "bail",
-        "confirmationRequired": true,
-        "prompts": {
-          "confirm": "Confirm.Intent-bail"
-        },
-        "slots": [
-          {
-            "name": "reason",
-            "type": "reason",
-            "elicitationRequired": true,
-            "confirmationRequired": false,
-            "prompts": {
-              "elicit": "Elicit.Intent-bail.IntentSlot-reason"
-            }
-          }
-        ]
-      }
-    ]
-  }
+  ]
 }
