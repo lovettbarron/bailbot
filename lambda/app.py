@@ -5,8 +5,8 @@ import random
 
 # --------------- Helpers that build all of the responses ----------------------
 
-def build_speechlet_response(output, should_end_session,card_content=None):
-	if card_content:
+def build_speechlet_response(output,should_end_session,card_content=None,reprompt_text='Sound good?'):
+	if card_content==None:
 		resp = {
 			'outputSpeech': {
 				'type': 'PlainText',
@@ -25,6 +25,12 @@ def build_speechlet_response(output, should_end_session,card_content=None):
 				, 'title': "Bail Bot Excuse"
 				, 'type': 'Simple'
 			},
+			 "reprompt": {
+	            "outputSpeech": {
+	                "type": "PlainText",
+	                "text": reprompt_text
+	            }
+	        },
 			'shouldEndSession': should_end_session
 		}
 		
@@ -46,11 +52,11 @@ def get_welcome_response():
 	session_attributes = {}
 	card_title = "You need an out?"
 	
-	start = ['So you want to stay in tonight?','Looking to bail on your plans?','Going out is hard. Need an excuse?','I never go out, and can help you with an excuse!']
+	start = ['Do you need an excuse to stay in tonight?','Looking for an excuse to bail on your plans?','Going out is hard. Need an excuse?','I never go out, and do you need an excuse?']
 	speech_output = random.choice(start) 
-	reprompt_text = None
+	reprompt_text = "Did you want an excuse?"
 	should_end_session = False
-	return build_response(session_attributes, build_speechlet_response(speech_output, should_end_session))
+	return build_response(session_attributes, build_speechlet_response(speech_output, should_end_session,None,reprompt_text))
 
 
 def handle_session_end_request():
@@ -60,14 +66,30 @@ def handle_session_end_request():
 	should_end_session = True
 	return build_response({}, build_speechlet_response(speech_output, should_end_session))
 
+def handle_session_cancel_request():
+	should_end_session = True
+	return build_response({}, build_speechlet_response('', should_end_session))
+
+
+def bail_response(intent, session):
+	session_attributes = {}
+	reason = pick_reason('')
+	reprompt_text = 'Did you want another excuse?'
+	prompt = ['You could try saying:', 'Here is an idea, say:', 'Here is an excuse. Say:']
+	# ask = ['Want another excuse?','Can I give you another excuse?','If that is all, a thank you would be nice']
+	speech_output = random.choice(prompt) +' '+ reason.get('excuse')
+	should_end_session = True
+	return build_response(session_attributes, build_speechlet_response(speech_output, should_end_session, speech_output,reprompt_text))
 
 def bail(intent, session):
 	session_attributes = {}
 	reason = pick_reason('')
-	reprompt_text = None
-	speech_output = 'You could try ' + reason.get('excuse')
+	reprompt_text = 'Did you want another excuse?'
+	prompt = ['You could try saying:', 'Here is an idea, say:', 'Here is an excuse. Say:']
+	ask = ['Want another excuse?','Can I give you another excuse?','If that is all, a thank you would be nice']
+	speech_output = random.choice(prompt) +' '+ reason.get('excuse') 
 	should_end_session = False
-	return build_response(session_attributes, build_speechlet_response(speech_output, should_end_session,speech_output))
+	return build_response(session_attributes, build_speechlet_response(speech_output+' '+ random.choice(ask), should_end_session,speech_output,reprompt_text))
 
 def fetch_reasons():
 	s3 = boto3.resource('s3')
@@ -92,9 +114,13 @@ def on_intent(intent_request, session):
 	intent_name = intent_request['intent']['name']
 	if intent_name == "bail":
 		return bail(intent, session)
+	elif intent_name == "bailoneshot":
+		return bail_response(intent,session)
 	elif intent_name == "AMAZON.HelpIntent":
 		return get_welcome_response()
-	elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
+	elif intent_name == "AMAZON.CancelIntent":
+		return handle_session_cancel_request()
+	elif intent_name == "AMAZON.StopIntent":
 		return handle_session_end_request()
 	else:
 		raise ValueError("Invalid intent")
